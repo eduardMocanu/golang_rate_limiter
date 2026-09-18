@@ -3,6 +3,7 @@ package main
 import (
 	"GO_rate_limiter/internal/httpmw"
 	"GO_rate_limiter/internal/limiter"
+	"fmt"
 	"net/http"
 )
 
@@ -13,6 +14,7 @@ func main() {
 	err := http.ListenAndServe("localhost:8080", httpmw.RateLimit(newLimiter, httpmw.KeyExtractorQuery, httpmw.InitMux()))
 
 	if err != nil {
+		fmt.Println("error ", err)
 		return
 	}
 }
