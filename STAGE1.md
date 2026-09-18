@@ -3,7 +3,7 @@
 Goal: a correct, concurrency-safe token bucket rate limiter exposed as HTTP
 middleware. Standard library only — no external dependencies.
 
-Build it all in `main.go` first. Split into packages at step 7, once the shape
+Build it all in `cmd/server/main.go` first. Split into packages at step 7, once the shape
 is obvious. Each step must compile and run before moving on.
 
 ---
@@ -168,7 +168,7 @@ compiler enforces "this is not a public API yet".
 designing an interface from a known implementation rather than guessing upfront.
 
 **Done when:** `go build ./...` and `go test -race ./...` both pass, and
-`main.go` contains no rate-limiting logic.
+`cmd/server/main.go` contains no rate-limiting logic.
 
 ---
 
@@ -210,7 +210,7 @@ abstraction leaked.
 ## Optional — a second algorithm
 
 Implement fixed-window or sliding-window counter behind the same `Limiter`
-interface, selected by config in `main.go`.
+interface, selected by config in `cmd/server/main.go`.
 
 This is the real test of step 7: if the existing tests and middleware work
 against the new implementation untouched, the abstraction was right.
@@ -223,7 +223,7 @@ against the new implementation untouched, the abstraction was right.
 - the server returns clean `429`s with correct headers under a `curl` loop
 - the limiter holds under concurrent load with an exact, provable allow count
 - memory is bounded under a flood of distinct keys
-- swapping the algorithm touches only `main.go`
+- swapping the algorithm touches only `cmd/server/main.go`
 
 That last point is what makes Stage 2 (Redis-backed, distributed) a small change
 instead of a rewrite.
