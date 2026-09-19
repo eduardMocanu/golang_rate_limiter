@@ -2,6 +2,7 @@ package httpmw
 
 import (
 	"GO_rate_limiter/internal/limiter"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -27,6 +28,7 @@ func InitMux() *http.ServeMux {
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("hello"))
+		fmt.Println("ok")
 		if err != nil {
 			return
 		}

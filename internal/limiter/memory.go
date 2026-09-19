@@ -1,6 +1,7 @@
 package limiter
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -56,7 +57,7 @@ func (limiter *Limiter) Allow(key string, now time.Time) bool {
 
 func NewLimiter(capacity, refillRate float64) *Limiter {
 	limiter := &Limiter{Users: make(map[string]*Bucket), Capacity: capacity, refillRate: refillRate, quit: make(chan struct{})}
-	go limiter.Evict(60)
+	go limiter.Evict(5)
 	return limiter
 }
 
@@ -66,7 +67,8 @@ func (limiter *Limiter) Evict(evictSeconds int64) {
 	for {
 		select {
 		case now := <-ticker.C:
-			limiter.sweep(now)
+			fmt.Println(limiter.Users)
+			fmt.Println(limiter.sweep(now))
 		case <-limiter.quit:
 			return
 		}
