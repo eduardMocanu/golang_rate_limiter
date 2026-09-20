@@ -1,8 +1,7 @@
 package httpmw
 
 import (
-	"GO_rate_limiter/internal/limiter"
-	"fmt"
+	"context"
 	"net/http"
 	"time"
 )
@@ -11,11 +10,22 @@ func KeyExtractorQuery(r *http.Request) string {
 	return r.URL.Query().Get("user")
 }
 
-func RateLimit(newLimiter *limiter.Limiter, keyExtractor func(r *http.Request) string, next http.Handler) http.Handler {
+type Limiter interface {
+	Allow(ctx context.Context, key string) (bool, error)
+}
+
+func RateLimit(newLimiter Limiter, keyExtractor func(r *http.Request) string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		key := keyExtractor(r)
+		ctx, cancel:= context.WithTimeout(r.Context(), 50 * time.Millisecond)
+		defer cancel()
+		allowed, err := newLimiter.Allow(ctx, key)
+		if err != nil {
+			http.Error(w, "rate limiter unavailable", http.StatusServiceUnavailable)
+			return
+		}
 
-		if !newLimiter.Allow(key, time.Now()) {
+		if !allowed {
 			http.Error(w, "rate limited", http.StatusTooManyRequests)
 			return
 		}
@@ -28,7 +38,7 @@ func InitMux() *http.ServeMux {
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("hello"))
-		fmt.Println("ok")
+
 		if err != nil {
 			return
 		}

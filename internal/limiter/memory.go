@@ -1,6 +1,7 @@
 package limiter
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -39,7 +40,8 @@ type Limiter struct {
 	closeOnce  sync.Once
 }
 
-func (limiter *Limiter) Allow(key string, now time.Time) bool {
+func (limiter *Limiter) Allow(ctx context.Context, key string) (bool, error) {
+	now := time.Now()
 	limiter.Mutex.Lock()
 	defer limiter.Mutex.Unlock()
 	value, ok := limiter.Users[key]
@@ -52,7 +54,7 @@ func (limiter *Limiter) Allow(key string, now time.Time) bool {
 		}
 		limiter.Users[key] = value
 	}
-	return value.Allow(now)
+	return value.Allow(now), nil
 }
 
 func NewLimiter(capacity, refillRate float64) *Limiter {
