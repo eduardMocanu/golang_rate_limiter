@@ -24,7 +24,7 @@ func main() {
 	}(client)
 	a := limiter.NewRedis(client, 10, 0.2)
 
-	err := http.ListenAndServe("localhost:8080", httpmw.RateLimit(a, httpmw.KeyExtractorQuery, httpmw.InitMux()))
+	err := http.ListenAndServe("localhost:8080", httpmw.RateLimit(a, httpmw.FirstExtractor(httpmw.KeyExtractorQuery, httpmw.KeyExtractorIP), httpmw.InitMux()))
 
 	if err != nil {
 		fmt.Println("error")

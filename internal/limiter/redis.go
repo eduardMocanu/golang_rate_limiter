@@ -56,8 +56,8 @@ func (rl *RedisLimiter) Allow(ctx context.Context, key string) (bool, error) {
 
 	now := float64(time.Now().UnixMilli()) / 1000
 
-	res, err := luaScript.Run(ctx, rl.client, []string{"rl:"+key}, rl.capacity, rl.refillRate, now).Int64()
-	if err != nil{
+	res, err := luaScript.Run(ctx, rl.client, []string{"rl:" + key}, rl.capacity, rl.refillRate, now).Int64()
+	if err != nil {
 		return false, err
 	}
 	return res == 1, nil
