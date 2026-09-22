@@ -10,7 +10,7 @@ import (
 )
 
 func CreateClient() *redis.Client {
-	return redis.NewClient(&redis.Options{Addr: string("localhost:6379")})
+	return redis.NewClient(&redis.Options{Addr: string("redis:6379")})
 }
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	}(client)
 	a := limiter.NewRedis(client, 10, 0.2)
 
-	err := http.ListenAndServe("localhost:8080", httpmw.RateLimit(a, httpmw.FirstExtractor(httpmw.KeyExtractorQuery, httpmw.KeyExtractorIP), httpmw.InitMux()))
+	err := http.ListenAndServe(":8080", httpmw.RateLimit(a, httpmw.FirstExtractor(httpmw.KeyExtractorQuery, httpmw.KeyExtractorIP), httpmw.InitMux()))
 
 	if err != nil {
 		fmt.Println("error")
