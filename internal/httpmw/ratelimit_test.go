@@ -19,7 +19,6 @@ func (s stubLimiter) Allow(ctx context.Context, key string) (bool, error) {
 }
 
 func TestRateLimitDenied(t *testing.T) {
-	// A handler that records whether it ran.
 	nextCalled := false
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		nextCalled = true
